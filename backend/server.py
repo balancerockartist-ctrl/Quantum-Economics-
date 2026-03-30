@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,9 +6,10 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
+import urllib.parse
 
 
 ROOT_DIR = Path(__file__).parent
@@ -36,6 +37,42 @@ class StatusCheck(BaseModel):
 
 class StatusCheckCreate(BaseModel):
     client_name: str
+
+class Product(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: str
+    price_sol: float
+    category: str
+    available: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ProductCreate(BaseModel):
+    name: str
+    description: str
+    price_sol: float
+    category: str
+    available: bool = True
+
+class PaymentQR(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    recipient: str
+    amount_sol: float
+    label: str
+    message: str
+    solana_pay_url: str
+    qr_image_url: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PaymentQRCreate(BaseModel):
+    recipient: str = "GodWorldFreePay1111111111111111111111111111"
+    amount_sol: float
+    label: str
+    message: str = ""
 
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
@@ -65,6 +102,59 @@ async def get_status_checks():
             check['timestamp'] = datetime.fromisoformat(check['timestamp'])
     
     return status_checks
+
+@api_router.get("/products", response_model=List[Product])
+async def get_products():
+    products = await db.products.find({}, {"_id": 0}).to_list(1000)
+    for p in products:
+        if isinstance(p.get('created_at'), str):
+            p['created_at'] = datetime.fromisoformat(p['created_at'])
+    return products
+
+@api_router.post("/products", response_model=Product)
+async def create_product(input: ProductCreate):
+    product = Product(**input.model_dump())
+    doc = product.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.products.insert_one(doc)
+    return product
+
+@api_router.delete("/products/{product_id}")
+async def delete_product(product_id: str):
+    result = await db.products.delete_one({"id": product_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return {"message": "Product deleted"}
+
+@api_router.post("/payment/generate-qr", response_model=PaymentQR)
+async def generate_payment_qr(input: PaymentQRCreate):
+    params = {
+        "amount": input.amount_sol,
+        "label": input.label,
+        "message": input.message,
+    }
+    solana_pay_url = f"solana:{input.recipient}?{urllib.parse.urlencode(params)}"
+    qr_encoded = urllib.parse.quote(solana_pay_url, safe='')
+    qr_image_url = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={qr_encoded}"
+
+    payment_qr = PaymentQR(
+        **input.model_dump(),
+        solana_pay_url=solana_pay_url,
+        qr_image_url=qr_image_url,
+    )
+    doc = payment_qr.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.payment_requests.insert_one(doc)
+    return payment_qr
+
+@api_router.get("/stats")
+async def get_stats():
+    product_count = await db.products.count_documents({})
+    payment_count = await db.payment_requests.count_documents({})
+    return {
+        "total_products": product_count,
+        "total_payments": payment_count,
+    }
 
 # Include the router in the main app
 app.include_router(api_router)

@@ -1,0 +1,2 @@
+# Exclude pre-existing files with non-standard formatting
+test_result.md

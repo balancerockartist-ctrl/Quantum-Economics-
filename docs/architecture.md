@@ -45,8 +45,8 @@ graph TD
     BE --> AG
     AG --> EL
 
-    FP -->|Phase 2| STR
-    FP -->|Phase 3| CRY
+    FP -->|Phase 4| STR
+    FP -->|Phase 4| CRY
 
     CI -.->|validates| FP
     CI -.->|validates| AG
@@ -75,7 +75,7 @@ projects/freepay/
     └── routes.py         # FastAPI route handlers
 ```
 
-**Key design constraint:** The MVP does NOT move real money. It is a double-entry ledger. Payment rail integrations (Stripe, crypto) are designed as swappable infrastructure adapters in Phase 2.
+**Key design constraint:** The MVP does NOT move real money. It is a double-entry ledger. Payment rail integrations (Stripe, crypto) are designed as swappable infrastructure adapters in Phase 4.
 
 ---
 

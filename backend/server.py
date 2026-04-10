@@ -10,7 +10,6 @@ from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 from urllib.parse import quote
-import random
 
 
 ROOT_DIR = Path(__file__).parent
@@ -171,6 +170,8 @@ class ScanResult(BaseModel):
 class ContractExecuteRequest(BaseModel):
     tx_id: str
     item_price: float
+    item_label: Optional[str] = ""
+    category: Optional[str] = ""
 
 class ContractExecuteResponse(BaseModel):
     success: bool
@@ -214,7 +215,7 @@ async def camera_scan(req: ScanRequest):
             category=req.category,
             item_price=0.0,
             tx_id="",
-            message=f"Category '{req.category}' not recognised",
+            message=f"Category '{req.category}' not recognized",
         )
     price_map = {"Hotel": 89.99, "Food": 12.50, "Housing": 250.00, "Water": 2.99, "Medical": 45.00}
     label_map = {
@@ -239,6 +240,8 @@ async def execute_contract(req: ContractExecuteRequest):
     tx_hash = "0x" + uuid.uuid4().hex[:40]
     CAMERA_TRANSACTIONS.append({
         "id": req.tx_id,
+        "item_label": req.item_label or "Item",
+        "category": req.category or "General",
         "amount": req.item_price,
         "tx_hash": tx_hash,
         "status": "Confirmed",

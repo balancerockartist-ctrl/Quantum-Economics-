@@ -63,7 +63,10 @@ export default function CameraScanner() {
       fetchPool();
       fetchTransactions();
     }, 5000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (scanTimerRef.current) clearTimeout(scanTimerRef.current);
+    };
   }, []);
 
   const handleScan = () => {
@@ -71,6 +74,9 @@ export default function CameraScanner() {
     setScanState("scanning");
     setScanResult(null);
     setContractResult(null);
+
+    // Clear any previous pending scan timer
+    if (scanTimerRef.current) clearTimeout(scanTimerRef.current);
 
     // Simulate a 2-second "camera scan" before hitting the API
     scanTimerRef.current = setTimeout(async () => {
@@ -94,6 +100,8 @@ export default function CameraScanner() {
       const res = await axios.post(`${API}/camera/execute-contract`, {
         tx_id: scanResult.tx_id,
         item_price: scanResult.item_price,
+        item_label: scanResult.item_label,
+        category: scanResult.category,
       });
       setContractResult(res.data);
       setScanState("done");
@@ -279,7 +287,7 @@ export default function CameraScanner() {
                 <div className="mt-2 h-1.5 rounded-full bg-zinc-700 overflow-hidden">
                   <div
                     className="h-full bg-purple-400 transition-all duration-700"
-                    style={{ width: `${pool.daily_capacity_pct}%` }}
+                    style={{ width: `${Math.min((pool.incoming_tips_24h / pool.daily_limit) * 100, 100)}%` }}
                   />
                 </div>
               </div>

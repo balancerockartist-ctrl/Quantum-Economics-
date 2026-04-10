@@ -1,34 +1,253 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* ── Base reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background: #0a0a0f;
+  color: #e8e8f0;
+  min-height: 100vh;
 }
 
+/* ── Page wrapper ── */
+.qr-store-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+/* ── Header ── */
+.qr-store-header {
+  width: 100%;
+  background: linear-gradient(135deg, #12122a 0%, #1a1a3e 100%);
+  border-bottom: 1px solid #2a2a5a;
+  padding: 1.25rem 2rem;
+}
+
+.qr-store-header-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.qr-store-logo {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.qr-store-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #a78bfa;
+  letter-spacing: -0.02em;
+}
+
+.qr-store-subtitle {
+  font-size: 0.875rem;
+  color: #7c7ca8;
+}
+
+/* ── Hero ── */
+.qr-store-hero {
+  max-width: 640px;
+  width: 100%;
+  padding: 2.5rem 1.5rem 1rem;
+  text-align: center;
+}
+
+.qr-store-hero-title {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #a78bfa, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.75rem;
+}
+
+.qr-store-hero-desc {
+  font-size: 1rem;
+  color: #9898b8;
+  line-height: 1.6;
+}
+
+/* ── QR Card ── */
+.qr-store-card-section {
+  max-width: 640px;
+  width: 100%;
+  padding: 1.5rem 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.qr-store-card {
+  background: #13132b;
+  border: 1px solid #2a2a5a;
+  border-radius: 1.25rem;
+  padding: 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 8px 40px rgba(100, 60, 220, 0.15);
+}
+
+.qr-store-card-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #7c7ca8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.qr-store-qr-image {
+  width: 256px;
+  height: 256px;
+  border-radius: 0.75rem;
+  border: 3px solid #a78bfa;
+  background: #fff;
+}
+
+.qr-store-wallet-hint {
+  font-size: 0.7rem;
+  color: #7c7ca8;
+  word-break: break-all;
+  text-align: center;
+}
+
+.qr-store-wallet-hint code {
+  color: #a78bfa;
+  font-family: "Courier New", monospace;
+}
+
+.qr-store-pay-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  color: #fff;
+  padding: 0.65rem 1.75rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.qr-store-pay-btn:hover {
+  opacity: 0.88;
+}
+
+/* ── Steps ── */
+.qr-store-steps {
+  max-width: 640px;
+  width: 100%;
+  padding: 1rem 1.5rem 2rem;
+}
+
+.qr-store-steps-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #c4b5fd;
+  margin-bottom: 1rem;
+}
+
+.qr-store-steps-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.qr-store-steps-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #13132b;
+  border: 1px solid #2a2a5a;
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  color: #b8b8d8;
+  line-height: 1.5;
+}
+
+.qr-store-step-num {
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ── IP section ── */
+.qr-store-ip-section {
+  max-width: 640px;
+  width: 100%;
+  padding: 0 1.5rem 2rem;
+}
+
+.qr-store-ip-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #c4b5fd;
+  margin-bottom: 0.75rem;
+}
+
+.qr-store-ip-body {
+  font-size: 0.9rem;
+  color: #9898b8;
+  line-height: 1.7;
+  background: #13132b;
+  border: 1px solid #2a2a5a;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+/* ── Footer ── */
+.qr-store-footer {
+  max-width: 640px;
+  width: 100%;
+  padding: 1rem 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  border-top: 1px solid #2a2a5a;
+  font-size: 0.78rem;
+  color: #7c7ca8;
+}
+
+.qr-store-status { font-weight: 600; }
+.qr-store-status--online  { color: #4ade80; }
+.qr-store-status--offline { color: #f87171; }
+.qr-store-status--connecting { color: #facc15; }
+
+/* ── Legacy classes (kept for compatibility) ── */
+.App-logo { height: 40vmin; pointer-events: none; }
 @media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+  .App-logo { animation: App-logo-spin infinite 20s linear; }
 }
-
 .App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+  background-color: #0f0f10;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
 }
-
-.App-link {
-    color: #61dafb;
-}
-
+.App-link { color: #61dafb; }
 @keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }

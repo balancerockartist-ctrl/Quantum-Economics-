@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
-import { QRCodeSVG } from "qrcode.react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -115,7 +113,12 @@ export default function FreePayStore() {
                 <div className="w-[220px] h-[220px] flex items-center justify-center text-zinc-500">Generating…</div>
               ) : payUrl ? (
                 <div className="p-3 bg-white rounded-xl">
-                  <QRCodeSVG value={payUrl} size={220} level="M" />
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(payUrl)}`}
+                    alt="Solana Pay QR Code"
+                    width={220}
+                    height={220}
+                  />
                 </div>
               ) : null}
 

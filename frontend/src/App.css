@@ -1,3 +1,27 @@
+.App {
+  background-color: #0a0a0f;
+  min-height: 100vh;
+}
+
+.qe-home {
+  background-color: #0a0a0f;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.qe-glow {
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Legacy classes kept for compatibility */
 .App-logo {
     height: 40vmin;
     pointer-events: none;
@@ -10,7 +34,7 @@
 }
 
 .App-header {
-    background-color: #0f0f10;
+    background-color: #0a0a0f;
     min-height: 100vh;
     display: flex;
     flex-direction: column;

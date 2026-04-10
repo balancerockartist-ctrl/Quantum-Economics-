@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import axios from "axios";
 import FreePayStore from "@/components/FreePayStore";
 import CreditLine from "@/components/CreditLine";
+import CameraScanner from "@/components/CameraScanner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -20,6 +21,7 @@ const NavBar = () => (
           { to: "/", label: "Home" },
           { to: "/store", label: "⚡ Free Store" },
           { to: "/credit-line", label: "🏦 Credit Line" },
+          { to: "/camera", label: "📷 Camera Scan" },
         ].map(({ to, label }) => (
           <NavLink
             key={to}
@@ -101,6 +103,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/store" element={<FreePayStore />} />
             <Route path="/credit-line" element={<CreditLine />} />
+            <Route path="/camera" element={<CameraScanner />} />
           </Routes>
         </div>
       </BrowserRouter>

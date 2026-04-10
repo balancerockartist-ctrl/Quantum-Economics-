@@ -145,6 +145,133 @@ async def get_credit_line():
         receivables_stream=1420.50,
     )
 
+# ── Camera / DualC Models ──────────────────────────────────────────────────────
+
+ITEM_CATEGORIES = ["Hotel", "Food", "Housing", "Water", "Medical"]
+
+class CreditPoolResponse(BaseModel):
+    available_pool: float
+    daily_capacity_pct: float
+    incoming_tips_24h: float
+    daily_limit: float
+
+class ScanRequest(BaseModel):
+    category: str
+    item_label: Optional[str] = ""
+
+class ScanResult(BaseModel):
+    verified: bool
+    item_label: str
+    category: str
+    item_price: float
+    tx_id: str
+    message: str
+
+class ContractExecuteRequest(BaseModel):
+    tx_id: str
+    item_price: float
+    item_label: Optional[str] = ""
+    category: Optional[str] = ""
+
+class ContractExecuteResponse(BaseModel):
+    success: bool
+    tx_hash: str
+    credit_released: float
+    membership_unlocked: bool
+    blockchain_confirmed: bool
+    message: str
+
+class CameraTransaction(BaseModel):
+    id: str
+    item_label: str
+    category: str
+    amount: float
+    tx_hash: str
+    status: str
+    timestamp: str
+
+# ── Camera / DualC Routes ──────────────────────────────────────────────────────
+
+CAMERA_TRANSACTIONS: List[dict] = []
+
+@api_router.get("/camera/pool", response_model=CreditPoolResponse)
+async def get_credit_pool():
+    total_24h = sum(t["amount"] for t in CAMERA_TRANSACTIONS[-50:] if t.get("status") == "Confirmed")
+    daily_limit = 500.0
+    pct = min((total_24h / daily_limit) * 100, 100.0)
+    return CreditPoolResponse(
+        available_pool=round(daily_limit - total_24h, 2),
+        daily_capacity_pct=round(pct, 1),
+        incoming_tips_24h=round(total_24h, 2),
+        daily_limit=daily_limit,
+    )
+
+@api_router.post("/camera/scan", response_model=ScanResult)
+async def camera_scan(req: ScanRequest):
+    if req.category not in ITEM_CATEGORIES:
+        return ScanResult(
+            verified=False,
+            item_label=req.item_label or "Unknown",
+            category=req.category,
+            item_price=0.0,
+            tx_id="",
+            message=f"Category '{req.category}' not recognized",
+        )
+    price_map = {"Hotel": 89.99, "Food": 12.50, "Housing": 250.00, "Water": 2.99, "Medical": 45.00}
+    label_map = {
+        "Hotel": "Hotel Room (1 Night)",
+        "Food": "Meal Voucher",
+        "Housing": "Temporary Shelter (1 Week)",
+        "Water": "Safe Drinking Water (1 Day)",
+        "Medical": "Basic Medical Consultation",
+    }
+    tx_id = str(uuid.uuid4())
+    return ScanResult(
+        verified=True,
+        item_label=req.item_label or label_map[req.category],
+        category=req.category,
+        item_price=price_map[req.category],
+        tx_id=tx_id,
+        message=f"Dual-C verification complete for {req.category} item",
+    )
+
+@api_router.post("/camera/execute-contract", response_model=ContractExecuteResponse)
+async def execute_contract(req: ContractExecuteRequest):
+    tx_hash = "0x" + uuid.uuid4().hex[:40]
+    CAMERA_TRANSACTIONS.append({
+        "id": req.tx_id,
+        "item_label": req.item_label or "Item",
+        "category": req.category or "General",
+        "amount": req.item_price,
+        "tx_hash": tx_hash,
+        "status": "Confirmed",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    })
+    return ContractExecuteResponse(
+        success=True,
+        tx_hash=tx_hash,
+        credit_released=req.item_price,
+        membership_unlocked=True,
+        blockchain_confirmed=True,
+        message="Credit released and lifetime membership unlocked for 24h",
+    )
+
+@api_router.get("/camera/transactions", response_model=List[CameraTransaction])
+async def get_camera_transactions():
+    recent = CAMERA_TRANSACTIONS[-20:][::-1]
+    return [
+        CameraTransaction(
+            id=t.get("id", str(uuid.uuid4())),
+            item_label=t.get("item_label", "Item"),
+            category=t.get("category", "General"),
+            amount=t.get("amount", 0.0),
+            tx_hash=t.get("tx_hash", ""),
+            status=t.get("status", "Pending"),
+            timestamp=t.get("timestamp", ""),
+        )
+        for t in recent
+    ]
+
 # Include the router in the main app
 app.include_router(api_router)
 
